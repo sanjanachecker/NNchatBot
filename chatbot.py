@@ -7,7 +7,6 @@ from nltk.stem import WordNetLemmatizer
 # import pre-trained model with tensorflow keras
 from tensorflow.keras.models import load_model
 
-# init lemmatizer, open intents, open pickled files, load model
 lemmatizer = WordNetLemmatizer()
 intents = json.loads(open('intents.json').read())
 words = pickle.load(open('words.pkl', 'rb'))
@@ -23,7 +22,6 @@ def clean_sentence(sentence):
 
 
 # given a sentence, return a binary BOW representation
-# 1 indicate presence of a word in a sentence
 def bag_of_words(sentence):
     sentence_words = clean_sentence(sentence)
     bag = [0] * len(words)
@@ -36,11 +34,9 @@ def bag_of_words(sentence):
 
 
 # convert sentence to BOW, use loaded NN model to predict intent of the sentence
-# return a dict list of intent probabilities
 def predict_class(sentence):
     bow = bag_of_words(sentence)
     res = model.predict(np.array([bow]))[0]
-    # predicted intents w probabilities higher than this threshold are included
     ERROR_THRESHOLD = 0.25
     result = [[i, r] for i, r in enumerate(res) if r > ERROR_THRESHOLD]
 
@@ -48,5 +44,4 @@ def predict_class(sentence):
     return_lis = []
     for r in result:
         return_lis.append({'intent': classes[r[0]], 'probability': str(r[1])})
-    # return list of dictionaries containing an intent and its associated probability
     return return_lis
